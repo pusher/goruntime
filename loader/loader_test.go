@@ -53,6 +53,8 @@ func TestSymlinkRefresher(t *testing.T) {
 	makeFileInDir(assert, tempDir+"/testdir1/app/file1", "hello")
 	makeFileInDir(assert, tempDir+"/testdir1/app/dir/file2", "world")
 	makeFileInDir(assert, tempDir+"/testdir1/app/dir2/file3", "\n 34  ")
+	makeFileInDir(assert, tempDir+"/testdir1/app/dir3/.file4", ".file4")
+	makeFileInDir(assert, tempDir+"/testdir1/app/.dir/file5", ".dir")
 	assert.NoError(err)
 	err = os.Symlink(tempDir+"/testdir1", tempDir+"/current")
 	assert.NoError(err)
@@ -68,6 +70,8 @@ func TestSymlinkRefresher(t *testing.T) {
 	assert.Equal("world", snapshot.Get("dir.file2"))
 	assert.Equal(uint64(7), snapshot.GetInteger("dir.file2", 7))
 	assert.Equal(uint64(34), snapshot.GetInteger("dir2.file3", 100))
+	assert.Equal("", snapshot.Get("dir3..file4"))
+	assert.Equal("", snapshot.Get(".dir.file5"))
 
 	info, _ := os.Stat(tempDir + "/testdir1/app/file1")
 	assert.Equal(info.ModTime(), snapshot.GetModified("file1"))
