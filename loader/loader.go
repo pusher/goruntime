@@ -90,7 +90,15 @@ func (l *Loader) walkDirectoryCallback(path string, info os.FileInfo, err error)
 	}
 
 	logger.Debugf("runtime: processing %s", path)
+	if info.IsDir() && strings.HasPrefix(info.Name(), ".") {
+		return filepath.SkipDir
+	}
+
 	if !info.IsDir() {
+		if strings.HasPrefix(info.Name(), ".") {
+			return nil
+		}
+
 		contents, err := ioutil.ReadFile(path)
 
 		if err != nil {
